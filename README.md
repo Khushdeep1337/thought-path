@@ -1,14 +1,12 @@
 # ThoughtPath
 
-A VS Code extension for understanding AI-assisted development through recorded actions, explanations, and evidence.
+A VS Code extension that maps model-reported development decisions beside Copilot Chat, with live tool activity and reported token usage.
 
-The first working base is a local trace explorer: import an OTLP trace, browse model and tool activity, and inspect reported token usage and timing. It includes a synthetic demo and makes no model calls.
+**Try it:** open extension/ in VS Code, press F5, then run **ThoughtPath: Open Decision Map** in the Development Host. Connect traces in Settings, reload, and use Copilot Agent chat with recordDecision enabled. Reporting instructions are supplied while the panel is open.
 
-**Try it:** open `extension/` in VS Code, run `npm ci`, press F5, then run **ThoughtPath: Load Demo Trace** in the Extension Development Host.
+See [setup, data handling, limitations, and development commands](extension/README.md).
 
-See [setup, supported formats, limitations, and development commands](extension/README.md).
-
-Built incrementally as a personal tool and portfolio project. Live Copilot capture and decision-to-code linking are not implemented yet.
+Built incrementally as a personal tool and portfolio project. Live transport and tool invocation are tested; signed-in Copilot end-to-end verification remains.
 
 ## Copyright
 

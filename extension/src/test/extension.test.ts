@@ -1,34 +1,27 @@
 import { strict as assert } from 'node:assert';
 import * as vscode from 'vscode';
-import { parseTrace } from '../trace';
-import { TraceView } from '../traceView';
 
-suite('ThoughtPath', () => {
-	test('activates, loads the demo, opens evidence, and clears the view', async () => {
+suite('ThoughtPath live panel', () => {
+	test('registers the tool and receives tool invocations without starting capture', async () => {
 		const extension = vscode.extensions.all.find(candidate => candidate.packageJSON.name === 'thought-path');
-		assert.ok(extension, 'ThoughtPath should be installed in the development host');
-		await extension.activate();
-		const commands = await vscode.commands.getCommands(true);
-		for (const command of ['thoughtpath.importTrace', 'thoughtpath.loadDemo', 'thoughtpath.clearTrace']) {
-			assert.ok(commands.includes(command), `${command} is registered`);
-		}
-		await vscode.commands.executeCommand('thoughtpath.loadDemo');
-		const bytes = await vscode.workspace.fs.readFile(vscode.Uri.joinPath(extension.extensionUri, 'samples', 'demo-trace.json'));
-		const parsed = parseTrace(Buffer.from(bytes).toString('utf8'));
-		const provider = new TraceView();
-		try {
-			provider.load(parsed);
-			const roots = provider.getChildren();
-			assert.equal(roots.length, 1);
-			assert.equal(provider.getChildren(roots[0]).length, 8);
-			await vscode.commands.executeCommand('thoughtpath.inspectEvent', parsed.traces[0].events[0]);
-			const detail = vscode.workspace.textDocuments.find(document => document.uri.scheme === 'thoughtpath');
-			assert.ok(detail);
-			assert.match(detail.getText(), /Synthetic demo/);
-			assert.equal(JSON.parse(detail.getText()).span.spanId, parsed.traces[0].events[0].id);
-			await vscode.commands.executeCommand('thoughtpath.clearTrace');
-			provider.clear();
-			assert.equal(provider.getChildren().length, 0);
-		} finally { provider.dispose(); }
+		assert.ok(extension);
+		const api = await extension.activate();
+		assert.equal(api.snapshot().theme, 'auto');
+		assert.equal(api.snapshot().automaticReporting, true);
+		assert.equal(extension.packageJSON.contributes.chatInstructions[0].when, 'thoughtpath.reporting');
+		assert.ok(vscode.lm.tools.some(tool => tool.name === 'thoughtpath_recordDecision'));
+		await vscode.commands.executeCommand('thoughtpath.open');
+		const result = await vscode.lm.invokeTool('thoughtpath_recordDecision', {
+			input: { goal: 'Integration test: choose a decoder', approaches: [
+				{ title: 'Decode every chunk', reason: 'Can split UTF8 characters.', status: 'rejected' },
+				{ title: 'Use StringDecoder', reason: 'Retains partial characters between reads.', status: 'chosen' },
+			], outcome: 'Transport verified; this is a test invocation, not an AI conversation.' }, toolInvocationToken: undefined,
+		});
+		const text = result.content[0];
+		assert.ok(text instanceof vscode.LanguageModelTextPart);
+		assert.equal(api.snapshot().report.id, JSON.parse(text.value).thoughtpathReportId);
+		assert.equal(api.snapshot().report.approaches.length, 2);
+		assert.equal(api.snapshot().connected, false);
+		assert.equal(api.snapshot().usage, undefined);
 	});
 });

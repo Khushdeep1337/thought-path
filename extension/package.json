@@ -1,7 +1,7 @@
 {
   "name": "thought-path",
   "displayName": "ThoughtPath",
-  "description": "Inspect AI development traces, tool activity, and reported token usage locally.",
+  "description": "Live decision maps, tool activity and reported token usage for Copilot Agent chat.",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.124.0"
@@ -9,54 +9,129 @@
   "categories": [
     "Visualization"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "thoughtpath.importTrace",
-        "title": "Import Trace",
-        "category": "ThoughtPath",
-        "icon": "$(folder-open)"
+        "command": "thoughtpath.open",
+        "title": "Open Decision Map",
+        "category": "ThoughtPath"
       },
       {
-        "command": "thoughtpath.loadDemo",
-        "title": "Load Demo Trace",
-        "category": "ThoughtPath",
-        "icon": "$(play)"
-      },
-      {
-        "command": "thoughtpath.clearTrace",
-        "title": "Clear Trace",
-        "category": "ThoughtPath",
-        "icon": "$(clear-all)"
+        "command": "thoughtpath.connect",
+        "title": "Connect / Disconnect Copilot Traces",
+        "category": "ThoughtPath"
       }
     ],
-    "viewsContainers": {
-      "activitybar": [{ "id": "thoughtpath", "title": "ThoughtPath", "icon": "media/thoughtpath.svg" }]
+    "languageModelTools": [
+      {
+        "name": "thoughtpath_recordDecision",
+        "toolReferenceName": "recordDecision",
+        "displayName": "Record a ThoughtPath decision",
+        "userDescription": "Show a concise decision summary in ThoughtPath.",
+        "modelDescription": "Record a concise implementation decision for the user. Report only approaches actually considered: one chosen approach and optional rejected alternatives, with brief justifications. Do not provide private chain-of-thought or invent alternatives. State whether the outcome is completed or pending. Use when the user requests ThoughtPath decision reporting.",
+        "canBeReferencedInPrompt": true,
+        "inputSchema": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "goal",
+            "approaches",
+            "outcome"
+          ],
+          "properties": {
+            "goal": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1000,
+              "description": "Concise summary of the user request."
+            },
+            "approaches": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 4,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "title",
+                  "reason",
+                  "status"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 160
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 800,
+                    "description": "Brief justification suitable for the user."
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "chosen",
+                      "rejected"
+                    ]
+                  }
+                }
+              }
+            },
+            "outcome": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1200,
+              "description": "Result, or clearly mark as pending."
+            }
+          }
+        }
+      }
+    ],
+    "configuration": {
+      "title": "ThoughtPath",
+      "properties": {
+        "thoughtpath.theme": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "light",
+            "dark"
+          ],
+          "enumDescriptions": [
+            "Follow the current VS Code theme.",
+            "Use a light panel.",
+            "Use a dark panel."
+          ],
+          "default": "auto",
+          "description": "Color theme for the decision graph."
+        },
+        "thoughtpath.automaticReporting": {
+          "type": "boolean",
+          "default": true,
+          "description": "Provide Copilot decision-reporting instructions while the ThoughtPath panel is open in this window. The recordDecision tool must be enabled."
+        }
+      }
     },
-    "views": {
-      "thoughtpath": [{ "id": "thoughtpath.traces", "name": "Trace Explorer" }]
-    },
-    "viewsWelcome": [{
-      "view": "thoughtpath.traces",
-      "contents": "Explore the evidence behind AI-assisted development.\n[Load synthetic demo](command:thoughtpath.loadDemo)\n[Import OTLP trace](command:thoughtpath.importTrace)\nFiles stay local. No model calls."
-    }],
-    "menus": {
-      "view/title": [
-        { "command": "thoughtpath.importTrace", "when": "view == thoughtpath.traces", "group": "navigation@1" },
-        { "command": "thoughtpath.loadDemo", "when": "view == thoughtpath.traces", "group": "navigation@2" },
-        { "command": "thoughtpath.clearTrace", "when": "view == thoughtpath.traces", "group": "navigation@3" }
-      ]
-    }
+    "chatInstructions": [
+      {
+        "path": "./prompts/reporting.instructions.md",
+        "when": "thoughtpath.reporting"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
-    "lint": "eslint src",
-    "test:unit": "npm run compile && node --test out/test/trace.test.js",
+    "lint": "eslint src media/panel.js",
+    "test:unit": "npm run compile && node --test out/test/trace.test.js out/test/live.test.js",
     "test": "vscode-test"
   },
   "devDependencies": {
@@ -68,5 +143,8 @@
     "typescript": "^5.9.3",
     "@vscode/test-cli": "^0.0.12",
     "@vscode/test-electron": "^2.5.2"
-  }
+  },
+  "extensionKind": [
+    "ui"
+  ]
 }
