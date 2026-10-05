@@ -2,11 +2,32 @@ import { open } from 'node:fs/promises';
 import { StringDecoder } from 'node:string_decoder';
 import { parseEvent, TraceEvent } from './trace';
 
+export const captureSettings = (path: string): Record<string, unknown> => ({ outfile: path, enabled: true, exporterType: 'file', captureContent: true });
+
+export async function restoreCapture(path: string, previous: Record<string, unknown>,
+	read: (key: string) => unknown, write: (key: string, value: unknown) => PromiseLike<void>) {
+	// Another window may have taken over the profile's exporter.
+	if (read('outfile') !== path) { return; }
+	const appliedSettings = captureSettings(path);
+	// Release ownership last so a failed restore can be retried.
+	for (const key of ['enabled', 'exporterType', 'captureContent', 'outfile']) {
+		const applied = appliedSettings[key];
+		if (read(key) === applied) { await write(key, previous[key]); }
+	}
+}
+
 export interface Decision {
 	id: string;
 	goal: string;
 	approaches: { title: string; reason: string; status: 'chosen' | 'rejected' }[];
 	outcome: string;
+}
+
+export function linkedTrace(report: Decision | undefined, events: TraceEvent[]): string | undefined {
+	if (!report) { return undefined; }
+	return events.find(event => event.operation === 'execute_tool'
+		&& String(event.attributes['gen_ai.tool.name'] ?? event.name).includes('thoughtpath_recordDecision')
+		&& String(event.attributes['gen_ai.tool.call.result'] ?? '').includes(report.id))?.traceId;
 }
 
 export function decisionInput(input: unknown): Omit<Decision, 'id'> {

@@ -1,0 +1,58 @@
+:root {
+ color-scheme: light dark;
+ --bg: var(--vscode-editor-background); --surface: var(--vscode-sideBar-background);
+ --fg: var(--vscode-editor-foreground); --muted: var(--vscode-descriptionForeground);
+ --border: var(--vscode-panel-border, #777); --accent: var(--vscode-textLink-foreground);
+ --input: var(--vscode-input-background); --focus: var(--vscode-focusBorder);
+ --edge: var(--vscode-descriptionForeground);
+}
+body[data-theme="light"] { color-scheme: light; --bg:#ffffff; --surface:#f3f3f3; --fg:#242424; --muted:#616161; --border:#c8c8c8; --accent:#005fb8; --input:#fff; --focus:#005fb8; --edge:#727272; }
+body[data-theme="dark"] { color-scheme: dark; --bg:#1f1f1f; --surface:#252526; --fg:#d4d4d4; --muted:#a6a6a6; --border:#494949; --accent:#75beff; --input:#313131; --focus:#75beff; --edge:#969696; }
+* { box-sizing:border-box; }
+[hidden] { display:none !important; }
+body { margin:0; background:var(--bg); color:var(--fg); font:var(--vscode-font-size)/1.45 var(--vscode-font-family); }
+header { padding:10px 14px 8px; border-bottom:1px solid var(--border); }
+.title-row { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+h1 { margin:0; font-size:13px; font-weight:600; }
+h2 { margin:0 0 6px; font-size:11px; font-weight:500; color:var(--muted); }
+p { margin:5px 0; overflow-wrap:anywhere; white-space:pre-wrap; }
+#status,.hint,.graph-caption { font-size:11px; color:var(--muted); }
+button,select { font:inherit; color:var(--fg); background:var(--input); border:1px solid var(--border); border-radius:3px; min-height:28px; }
+button { cursor:pointer; padding:3px 8px; }
+button:hover { border-color:var(--accent); }
+button:disabled { opacity:.6; cursor:default; }
+button:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible,#canvas:focus-visible { outline:2px solid var(--focus); outline-offset:2px; }
+.navigation { display:flex; align-items:center; gap:8px; padding:10px 14px; }
+.navigation label { font-size:11px; color:var(--muted); }
+#reports { min-width:0; flex:1; width:0; padding:4px; }
+#settings-panel { padding:14px; border-bottom:1px solid var(--border); background:var(--surface); }
+#settings-panel>label:not(.check) { display:block; margin-bottom:5px; }
+#theme { width:100%; margin-bottom:12px; padding:4px; }
+.check { display:flex; align-items:center; gap:6px; }
+#settings-panel button { margin:6px 4px 4px 0; }
+#settings-panel details { margin-top:12px; }
+#canvas { overflow:auto; padding:22px 16px; background-image:radial-gradient(var(--border) .7px,transparent .7px); background-size:18px 18px; }
+#graph { position:relative; display:flex; flex-direction:column; align-items:center; gap:64px; min-width:240px; }
+#edges { position:absolute; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none; }
+#edges path { fill:none; stroke:var(--edge); stroke-width:1.3; }
+#edges path.chosen { stroke:var(--accent); stroke-width:2; }
+#edges path.rejected { stroke-dasharray:4 4; }
+#edges circle { fill:var(--bg); stroke:var(--edge); stroke-width:1.5; }
+.node { position:relative; z-index:1; border:1px solid var(--border); border-radius:5px; background:var(--surface); padding:11px 13px; overflow-wrap:anywhere; }
+.goal,.outcome { width:260px; max-width:90%; }
+.goal { border-left:3px solid var(--accent); }
+.outcome { border-top:2px solid var(--accent); }
+.branch-row { display:flex; gap:24px; align-items:flex-start; width:100%; justify-content:center; }
+.approach { flex:1; min-width:150px; max-width:220px; }
+.approach.chosen { border-color:var(--accent); }
+.approach summary { font-size:12px; font-weight:600; cursor:pointer; min-height:24px; }
+.approach p { font-size:12px; margin-top:10px; }
+.badge { display:block; color:var(--muted); font-size:10px; margin-bottom:7px; }
+.chosen .badge { color:var(--accent); }
+.graph-caption { margin:0; padding:8px 14px; border-bottom:1px solid var(--border); }
+footer { padding:12px 14px; }
+footer summary { cursor:pointer; font-size:12px; }
+#usage,#tools { font-size:11px; }
+ul { padding-left:18px; }
+.empty { color:var(--muted); font-size:12px; text-align:center; }
+@media (forced-colors: active) { .node,button,select { border-color:CanvasText; } #edges path { stroke:CanvasText; } }
