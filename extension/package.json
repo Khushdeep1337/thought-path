@@ -126,13 +126,14 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
+    "vscode:prepublish": "npm run clean && npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src media/panel.js",
     "test:unit": "npm run compile && node --test out/test/trace.test.js out/test/live.test.js",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "clean": "node -e \"require('node:fs').rmSync('out', { recursive: true, force: true })\""
   },
   "devDependencies": {
     "@types/vscode": "^1.124.0",
