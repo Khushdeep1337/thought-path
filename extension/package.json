@@ -1,0 +1,72 @@
+{
+  "name": "thought-path",
+  "displayName": "ThoughtPath",
+  "description": "Inspect AI development traces, tool activity, and reported token usage locally.",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.124.0"
+  },
+  "categories": [
+    "Visualization"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "thoughtpath.importTrace",
+        "title": "Import Trace",
+        "category": "ThoughtPath",
+        "icon": "$(folder-open)"
+      },
+      {
+        "command": "thoughtpath.loadDemo",
+        "title": "Load Demo Trace",
+        "category": "ThoughtPath",
+        "icon": "$(play)"
+      },
+      {
+        "command": "thoughtpath.clearTrace",
+        "title": "Clear Trace",
+        "category": "ThoughtPath",
+        "icon": "$(clear-all)"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [{ "id": "thoughtpath", "title": "ThoughtPath", "icon": "media/thoughtpath.svg" }]
+    },
+    "views": {
+      "thoughtpath": [{ "id": "thoughtpath.traces", "name": "Trace Explorer" }]
+    },
+    "viewsWelcome": [{
+      "view": "thoughtpath.traces",
+      "contents": "Explore the evidence behind AI-assisted development.\n[Load synthetic demo](command:thoughtpath.loadDemo)\n[Import OTLP trace](command:thoughtpath.importTrace)\nFiles stay local. No model calls."
+    }],
+    "menus": {
+      "view/title": [
+        { "command": "thoughtpath.importTrace", "when": "view == thoughtpath.traces", "group": "navigation@1" },
+        { "command": "thoughtpath.loadDemo", "when": "view == thoughtpath.traces", "group": "navigation@2" },
+        { "command": "thoughtpath.clearTrace", "when": "view == thoughtpath.traces", "group": "navigation@3" }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test:unit": "npm run compile && node --test out/test/trace.test.js",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.124.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "typescript-eslint": "^8.56.1",
+    "eslint": "^9.39.3",
+    "typescript": "^5.9.3",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2"
+  }
+}
