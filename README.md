@@ -4,7 +4,7 @@ A VS Code extension that maps model-reported development decisions beside Copilo
 
 **Try it:** open extension/ in VS Code, press F5, then run **ThoughtPath: Open Decision Map** in the Development Host. Connect traces in Settings, reload, and use Copilot Agent chat with recordDecision enabled. Reporting instructions are supplied while the panel is open.
 
-See [setup, data handling, limitations, and development commands](extension/README.md).
+See [setup, data handling, limitations, and development commands](extension/README.md) and the [privacy notice](extension/PRIVACY.md).
 
 Built incrementally as a personal tool and portfolio project. Live transport and tool invocation are tested; signed-in Copilot end-to-end verification remains.
 

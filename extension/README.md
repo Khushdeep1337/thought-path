@@ -29,6 +29,8 @@ Settings offers Follow VS Code (default), Light, and Dark. The automatic mode us
 
 ## Capture and retention
 
+Read the [privacy notice](PRIVACY.md) for data processing, third-party services, retention, and deletion controls.
+
 Connecting changes four profile-level Copilot settings: otel.enabled, otel.exporterType, otel.outfile, and otel.captureContent. Previous explicit values are saved before changes. Disconnect restores each value only if it still equals the value ThoughtPath applied, preserving subsequent user changes. If another window has changed the output path, its exporter settings are left alone. Reload after disconnect to stop the exporter.
 
 Content capture can include prompts, responses, code and tool data from other chats in the same profile. Data is written to a timestamped JSONL file in the extension's global storage folder, outside this repository. **Show capture file** reveals it. Files are not automatically rotated or deleted; disconnect and reload when finished, then delete captures you no longer need. Existing telemetry environment variables or organization policy can override the requested settings.

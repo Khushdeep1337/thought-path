@@ -146,5 +146,11 @@
   },
   "extensionKind": [
     "ui"
-  ]
+  ],
+  "publisher": "KhushdeepBrar",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Khushdeep1337/thought-path.git",
+    "directory": "extension"
+  }
 }
