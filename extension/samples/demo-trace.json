@@ -1,0 +1,65 @@
+{
+  "resourceSpans": [{
+    "resource": { "attributes": [
+      { "key": "service.name", "value": { "stringValue": "thoughtpath-synthetic-demo" } },
+      { "key": "thoughtpath.synthetic", "value": { "boolValue": true } }
+    ] },
+    "scopeSpans": [{
+      "scope": { "name": "thoughtpath-demo" },
+      "spans": [
+        {
+          "traceId": "0123456789abcdef0123456789abcdef", "spanId": "0000000000000001",
+          "name": "invoke_agent — investigate a validation bug (synthetic)",
+          "startTimeUnixNano": "1790964000000000000", "endTimeUnixNano": "1790964010000000000",
+          "attributes": [
+            { "key": "gen_ai.operation.name", "value": { "stringValue": "invoke_agent" } },
+            { "key": "gen_ai.usage.input_tokens", "value": { "intValue": "1400" } },
+            { "key": "gen_ai.usage.output_tokens", "value": { "intValue": "180" } }
+          ]
+        },
+        {
+          "traceId": "0123456789abcdef0123456789abcdef", "spanId": "0000000000000002", "parentSpanId": "0000000000000001",
+          "name": "chat — plan investigation",
+          "startTimeUnixNano": "1790964000000000000", "endTimeUnixNano": "1790964002000000000",
+          "attributes": [
+            { "key": "gen_ai.operation.name", "value": { "stringValue": "chat" } },
+            { "key": "gen_ai.response.model", "value": { "stringValue": "demo-model" } },
+            { "key": "gen_ai.usage.input_tokens", "value": { "intValue": "600" } },
+            { "key": "gen_ai.usage.output_tokens", "value": { "intValue": "80" } }
+          ]
+        },
+        {
+          "traceId": "0123456789abcdef0123456789abcdef", "spanId": "0000000000000003", "parentSpanId": "0000000000000001",
+          "name": "readFile — src/validation.ts",
+          "startTimeUnixNano": "1790964002000000000", "endTimeUnixNano": "1790964002050000000",
+          "attributes": [
+            { "key": "gen_ai.operation.name", "value": { "stringValue": "execute_tool" } },
+            { "key": "gen_ai.tool.name", "value": { "stringValue": "readFile" } },
+            { "key": "gen_ai.tool.call.arguments", "value": { "stringValue": "{\"path\":\"src/validation.ts\"}" } }
+          ]
+        },
+        {
+          "traceId": "0123456789abcdef0123456789abcdef", "spanId": "0000000000000004", "parentSpanId": "0000000000000001",
+          "name": "runCommand — reproduce failing test",
+          "startTimeUnixNano": "1790964003000000000", "endTimeUnixNano": "1790964006000000000",
+          "status": { "code": 2, "message": "Synthetic test failure: empty input accepted" },
+          "attributes": [
+            { "key": "gen_ai.operation.name", "value": { "stringValue": "execute_tool" } },
+            { "key": "gen_ai.tool.name", "value": { "stringValue": "runCommand" } }
+          ]
+        },
+        {
+          "traceId": "0123456789abcdef0123456789abcdef", "spanId": "0000000000000005", "parentSpanId": "0000000000000001",
+          "name": "chat — explain proposed correction",
+          "startTimeUnixNano": "1790964007000000000", "endTimeUnixNano": "1790964010000000000",
+          "attributes": [
+            { "key": "gen_ai.operation.name", "value": { "stringValue": "chat" } },
+            { "key": "gen_ai.usage.input_tokens", "value": { "intValue": "800" } },
+            { "key": "gen_ai.usage.output_tokens", "value": { "intValue": "100" } },
+            { "key": "gen_ai.output.messages", "value": { "stringValue": "Synthetic explanation: add the missing empty-input check to the existing validator. This is example output, not an internal reasoning trace." } }
+          ]
+        }
+      ]
+    }]
+  }]
+}
