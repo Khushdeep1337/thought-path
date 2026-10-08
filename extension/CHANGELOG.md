@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.0.3
+
+- Remove the extra outline around the selected decision.
+
+- Show all retained decisions, with explicit parent links for deeper paths and branching follow-ups.
+- Replace clipped goal text in the selector with short decision numbers and a wrapping title.
+
+## 0.0.2
+
+- Align the tool description and automatic-reporting instructions; explicit user requests are no longer described as the only trigger.
+
+- Read Copilot trace records with top-level trace and span IDs, alongside older SDK records.
+- Clarify that the graph requires a recordDecision tool call, not just a chat explanation.
+
 ## 0.0.1 — Unreleased
 
 - Replace the tutorial and trace tree with an editor-side decision map.

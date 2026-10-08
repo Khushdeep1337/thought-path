@@ -2,7 +2,7 @@
   "name": "thought-path",
   "displayName": "ThoughtPath",
   "description": "Live decision maps, tool activity and reported token usage for Copilot Agent chat.",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "engines": {
     "vscode": "^1.124.0"
   },
@@ -32,7 +32,7 @@
         "toolReferenceName": "recordDecision",
         "displayName": "Record a ThoughtPath decision",
         "userDescription": "Show a concise decision summary in ThoughtPath.",
-        "modelDescription": "Record a concise implementation decision for the user. Report only approaches actually considered: one chosen approach and optional rejected alternatives, with brief justifications. Do not provide private chain-of-thought or invent alternatives. State whether the outcome is completed or pending. Use when the user requests ThoughtPath decision reporting.",
+        "modelDescription": "Record a concise development decision in the ThoughtPath graph. Call this tool when active ThoughtPath instructions request reporting or the user asks for it. A prose explanation in chat does not update the graph. Report only approaches actually considered: exactly one chosen approach and optional rejected alternatives, with brief user-facing justifications. Do not provide private chain-of-thought or invent alternatives. State whether the outcome is completed or pending. For multiple decisions, call once per decision in sequence. When a decision builds on a previous recorded outcome in this conversation, set parentReportId to that call’s returned thoughtpathReportId. Omit it for unrelated decisions; never guess a parent ID.",
         "canBeReferencedInPrompt": true,
         "inputSchema": {
           "type": "object",
@@ -88,6 +88,12 @@
               "minLength": 1,
               "maxLength": 1200,
               "description": "Result, or clearly mark as pending."
+            },
+            "parentReportId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100,
+              "description": "Optional thoughtpathReportId returned by an earlier call in this conversation whose outcome this decision builds on. Omit for an independent decision. Call parents before children."
             }
           }
         }

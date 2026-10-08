@@ -23,5 +23,22 @@ suite('ThoughtPath live panel', () => {
 		assert.equal(api.snapshot().report.approaches.length, 2);
 		assert.equal(api.snapshot().connected, false);
 		assert.equal(api.snapshot().usage, undefined);
+		const rootId = api.snapshot().report.id;
+		const input = { goal: 'Choose a buffer size', approaches: [
+			{ title: 'Bound each read', reason: 'Limit memory during large appends.', status: 'chosen' },
+		], outcome: 'Pending implementation.', parentReportId: rootId };
+		await vscode.lm.invokeTool('thoughtpath_recordDecision', { input, toolInvocationToken: undefined });
+		const childId = api.snapshot().report.id;
+		await vscode.lm.invokeTool('thoughtpath_recordDecision', {
+			input: { ...input, goal: 'Choose a recovery policy', parentReportId: childId }, toolInvocationToken: undefined,
+		});
+		assert.equal(api.snapshot().reports.length, 3);
+		assert.equal(api.snapshot().reports[1].parentReportId, rootId);
+		assert.equal(api.snapshot().report.parentReportId, childId);
+		assert.equal(api.snapshot().reports[0].approaches.length, 2);
+		await assert.rejects(async () => vscode.lm.invokeTool('thoughtpath_recordDecision', {
+			input: { ...input, parentReportId: 'missing' }, toolInvocationToken: undefined,
+		}));
+		assert.equal(api.snapshot().reports.length, 3);
 	});
 });

@@ -24,15 +24,22 @@ button:disabled { opacity:.6; cursor:default; }
 button:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible,#canvas:focus-visible { outline:2px solid var(--focus); outline-offset:2px; }
 .navigation { display:flex; align-items:center; gap:8px; padding:10px 14px; }
 .navigation label { font-size:11px; color:var(--muted); }
-#reports { min-width:0; flex:1; width:0; padding:4px; }
+#reports { min-width:90px; padding:4px 8px; }
+#pause { margin-left:auto; }
+#selected-goal { margin:0; padding:0 14px 12px; font-weight:500; }
 #settings-panel { padding:14px; border-bottom:1px solid var(--border); background:var(--surface); }
 #settings-panel>label:not(.check) { display:block; margin-bottom:5px; }
 #theme { width:100%; margin-bottom:12px; padding:4px; }
 .check { display:flex; align-items:center; gap:6px; }
 #settings-panel button { margin:6px 4px 4px 0; }
 #settings-panel details { margin-top:12px; }
-#canvas { overflow:auto; padding:22px 16px; background-image:radial-gradient(var(--border) .7px,transparent .7px); background-size:18px 18px; }
-#graph { position:relative; display:flex; flex-direction:column; align-items:center; gap:64px; min-width:240px; }
+#canvas { max-height:70vh; min-height:180px; overflow:auto; padding:22px 16px; background-image:radial-gradient(var(--border) .7px,transparent .7px); background-size:18px 18px; }
+#graph { position:relative; width:max-content; min-width:100%; }
+#decision-paths { display:flex; flex-direction:column; align-items:center; gap:100px; }
+.decision { display:flex; flex-direction:column; align-items:center; gap:56px; min-width:260px; }
+.follow-ups { display:flex; gap:40px; align-items:flex-start; }
+.decision-select { font-size:11px; }
+#edges path.follow-up { stroke:var(--accent); stroke-width:2; }
 #edges { position:absolute; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none; }
 #edges path { fill:none; stroke:var(--edge); stroke-width:1.3; }
 #edges path.chosen { stroke:var(--accent); stroke-width:2; }
@@ -43,7 +50,7 @@ button:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visi
 .goal { border-left:3px solid var(--accent); }
 .outcome { border-top:2px solid var(--accent); }
 .branch-row { display:flex; gap:24px; align-items:flex-start; width:100%; justify-content:center; }
-.approach { flex:1; min-width:150px; max-width:220px; }
+.approach { width:190px; flex-shrink:0; }
 .approach.chosen { border-color:var(--accent); }
 .approach summary { font-size:12px; font-weight:600; cursor:pointer; min-height:24px; }
 .approach p { font-size:12px; margin-top:10px; }

@@ -18,6 +18,7 @@ export async function restoreCapture(path: string, previous: Record<string, unkn
 
 export interface Decision {
 	id: string;
+	parentReportId?: string;
 	goal: string;
 	approaches: { title: string; reason: string; status: 'chosen' | 'rejected' }[];
 	outcome: string;
@@ -30,7 +31,7 @@ export function linkedTrace(report: Decision | undefined, events: TraceEvent[]):
 		&& String(event.attributes['gen_ai.tool.call.result'] ?? '').includes(report.id))?.traceId;
 }
 
-export function decisionInput(input: unknown): Omit<Decision, 'id'> {
+export function decisionInput(input: unknown, reports: readonly Decision[] = []): Omit<Decision, 'id'> {
 	if (!input || typeof input !== 'object') { throw new Error('Expected a decision object.'); }
 	const value = input as Record<string, unknown>;
 	const text = (item: unknown, limit: number) => {
@@ -45,18 +46,23 @@ export function decisionInput(input: unknown): Omit<Decision, 'id'> {
 		return { title: text(item.title, 160), reason: text(item.reason, 800), status: item.status as 'chosen' | 'rejected' };
 	});
 	if (approaches.filter(item => item.status === 'chosen').length !== 1) { throw new Error('Exactly one approach must be chosen.'); }
-	return { goal: text(value.goal, 1000), approaches, outcome: text(value.outcome, 1200) };
+	const parentReportId = value.parentReportId === undefined ? undefined : text(value.parentReportId, 100);
+	if (parentReportId && !reports.some(report => report.id === parentReportId)) {
+		throw new Error('Parent decision is no longer available. Omit parentReportId to start a separate path.');
+	}
+	return { goal: text(value.goal, 1000), approaches, outcome: text(value.outcome, 1200),
+		...(parentReportId ? { parentReportId } : {}) };
 }
 
-// Copilot's file exporter serializes SDK ReadableSpan objects, not OTLP envelopes.
+// Copilot exports flattened spans; older versions serialize the SDK context separately.
 export function liveEvent(line: string): TraceEvent | undefined {
 	const span = JSON.parse(line);
-	if (!span || typeof span !== 'object' || !span._spanContext) { return undefined; }
+	if (!span || typeof span !== 'object' || (!span.traceId && !span._spanContext)) { return undefined; }
 	const nano = (time: unknown) => Array.isArray(time) && time.length === 2
 		&& time.every(Number.isSafeInteger) && time[0] >= 0 && time[1] >= 0 && time[1] < 1e9
 		? (BigInt(time[0]) * 1_000_000_000n + BigInt(time[1])).toString() : undefined;
 	return parseEvent({
-		...span._spanContext, name: span.name, status: span.status,
+		...(span._spanContext ?? span), name: span.name, status: span.status,
 		startTimeUnixNano: nano(span.startTime), endTimeUnixNano: nano(span.endTime),
 		attributes: Object.entries(span.attributes ?? {}).map(([key, value]) => ({ key, value: { stringValue: value } })),
 	}, undefined);

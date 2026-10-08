@@ -53,6 +53,20 @@ test('a failed settings restore retains ownership so disconnect can be retried',
 	assert.deepEqual(current, previous);
 });
 
+test('follow-up decisions link only to existing reports, with independent roots and arbitrary depth', () => {
+	const root = { ...decisionInput(decision), id: 'root' };
+	const child = { ...decisionInput({ ...decision, parentReportId: root.id }, [root]), id: 'child' };
+	const next = decisionInput({ ...decision, parentReportId: child.id }, [root, child]);
+	assert.equal(child.parentReportId, root.id);
+	assert.equal(next.parentReportId, child.id);
+	assert.equal(decisionInput(decision, [root, child]).parentReportId, undefined);
+	assert.throws(() => decisionInput({ ...decision, parentReportId: 'missing' }, [root]), /no longer available/);
+	assert.throws(() => decisionInput({ ...decision, parentReportId: root.id }, [child]), /no longer available/);
+	for (const parentReportId of [null, 42, '', 'x'.repeat(101)]) {
+		assert.throws(() => decisionInput({ ...decision, parentReportId }, [root]));
+	}
+});
+
 test('SDK spans preserve timing, ignore metrics, and associate only an explicit tool result', () => {
 	const event = liveEvent(JSON.stringify(span()))!;
 	assert.equal(event.durationMs, 100);
@@ -63,6 +77,17 @@ test('SDK spans preserve timing, ignore metrics, and associate only an explicit 
 	assert.equal(linkedTrace({ ...report, id: 'another-report' }, [event]), undefined);
 	assert.equal(linkedTrace(report, [{ ...event, attributes: { ...event.attributes, 'gen_ai.tool.name': 'unrelated' } }]), undefined);
 	assert.equal(summarize({ id: event.traceId, events: [event] }).input.total, undefined);
+});
+
+test('current Copilot exports with top-level IDs produce the same event as SDK spans', () => {
+	const { _spanContext, ...fields } = span();
+	const flattened = { ...fields, ..._spanContext };
+	const event = liveEvent(JSON.stringify(flattened));
+	assert.ok(event);
+	assert.equal(event.traceId, _spanContext.traceId);
+	assert.equal(event.id, _spanContext.spanId);
+	assert.equal(event.durationMs, 100);
+	assert.equal(linkedTrace({ ...decisionInput(decision), id: 'report-1' }, [event]), event.traceId);
 });
 
 test('live tail handles missing files, split UTF8, partial lines, append, corruption and truncation', async () => {

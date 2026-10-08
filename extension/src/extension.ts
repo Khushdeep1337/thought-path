@@ -4,7 +4,7 @@ import { captureSettings, Decision, decisionInput, linkedTrace, LiveTail, restor
 import { summarize, TraceEvent, durationLabel } from './trace';
 
 const stateKey = 'liveConnection';
-const reportingPrompt = 'Use #recordDecision for this conversation. After each meaningful implementation decision, report a concise goal, the approach chosen and a brief justification, any alternatives you actually considered, and the outcome (or pending result). Do not invent alternatives or provide private chain-of-thought. One report per meaningful decision, not per tool call.';
+const reportingPrompt = 'Use #recordDecision for this conversation. After each meaningful implementation decision, report a concise goal, the approach chosen and a brief justification, any alternatives you actually considered, and the outcome (or pending result). Do not invent alternatives or provide private chain-of-thought. One report per meaningful decision, not per tool call. For a follow-up decision, set parentReportId to the thoughtpathReportId returned by its parent call in this conversation. Omit it for unrelated decisions.';
 interface Connection { path: string; previous: Record<string, unknown>; }
 
 export function activate(context: vscode.ExtensionContext) {
@@ -43,7 +43,7 @@ export function activate(context: vscode.ExtensionContext) {
 			theme: vscode.workspace.getConfiguration('thoughtpath').get<string>('theme', 'auto'),
 			automaticReporting: vscode.workspace.getConfiguration('thoughtpath').get<boolean>('automaticReporting', true),
 			connected: !!connection, paused, status, discarded, skipped: tail?.skipped ?? 0,
-			reports: reports.map(item => ({ id: item.id, goal: item.goal })), selected: report?.id, report,
+			reports, selected: report?.id, report,
 			traceId, observed: all.length, path: connection?.path,
 			usage: traceId ? { input: summary.input, output: summary.output, calls: summary.calls,
 				duration: durationLabel(summary.durationMs), errors: summary.errors } : undefined,
@@ -65,9 +65,9 @@ export function activate(context: vscode.ExtensionContext) {
 		<link rel="stylesheet" href="${media('panel.css')}"><title>ThoughtPath</title></head><body>
 
 		<header><div class="title-row"><h1>ThoughtPath</h1><button id="settings" title="Panel settings">Settings</button></div><p id="status" role="status"></p></header>
-		<section id="settings-panel" hidden aria-label="Panel settings"><label for="theme">Appearance</label><select id="theme"><option value="auto">Follow VS Code</option><option value="light">Light</option><option value="dark">Dark</option></select><label class="check"><input type="checkbox" id="automatic">Automatic reporting while open</label><p class="hint">Copilot receives reporting instructions for relevant requests while this panel is open. Enable recordDecision in the chat tool picker.</p><button id="prompt">Copy prompt instead</button><button id="connect">Connect traces</button><button id="clear">Clear view</button><details><summary>Local capture &amp; overhead</summary><p>Capture writes prompts, responses and tool data from this profile locally. Disconnect and reload to stop export. Files remain on disk. Reporting adds tool-call tokens; overhead is not measured separately.</p><p id="path"></p><button id="reveal">Show capture file</button></details><p id="retention" class="hint"></p></section>
-		<div class="navigation"><label for="reports">Decision</label><select id="reports"><option>No reports yet</option></select><button id="pause">Pause</button></div>
-		<main><div id="canvas" tabindex="0" role="region" aria-label="Decision graph. Scroll horizontally to explore branches."><div id="graph"><svg id="edges" aria-hidden="true"></svg><section class="node goal" id="goal-node"><h2>Request</h2><p id="goal">Waiting for a decision</p></section><div id="approaches" class="branch-row"></div><section class="node outcome" id="outcome-node"><h2>Outcome</h2><p id="outcome">The chosen approach leads here.</p></section></div></div><p class="graph-caption">Reported approaches · expand a node for its explanation</p></main>
+		<section id="settings-panel" hidden aria-label="Panel settings"><label for="theme">Appearance</label><select id="theme"><option value="auto">Follow VS Code</option><option value="light">Light</option><option value="dark">Dark</option></select><label class="check"><input type="checkbox" id="automatic">Automatic reporting while open</label><p class="hint">Copilot receives reporting instructions for relevant requests while this panel is open. Enable recordDecision in Chat customizations → Tools. Automatic invocation depends on Copilot; use #recordDecision to request a report explicitly.</p><button id="prompt">Copy prompt instead</button><button id="connect">Connect traces</button><button id="clear">Clear view</button><details><summary>Local capture &amp; overhead</summary><p>Capture writes prompts, responses and tool data from this profile locally. Disconnect and reload to stop export. Files remain on disk. Reporting adds tool-call tokens; overhead is not measured separately.</p><p id="path"></p><button id="reveal">Show capture file</button></details><p id="retention" class="hint"></p></section>
+		<div class="navigation"><label for="reports">Decision</label><select id="reports" aria-describedby="selected-goal"><option>No reports yet</option></select><button id="pause">Pause</button></div><p id="selected-goal"></p>
+		<main><div id="canvas" tabindex="0" role="region" aria-label="Decision graph. Scroll to explore decisions and branches."><div id="graph"><svg id="edges" aria-hidden="true"></svg><div id="decision-paths"></div></div></div><p class="graph-caption">All retained decisions · links show reported follow-ups · select a decision for its tools and usage</p></main>
 		<footer><details open><summary>Tools &amp; usage</summary><p id="usage">Connect traces in Settings for recorded activity.</p><ul id="tools"></ul></details></footer>
 		<script nonce="${nonce}" src="${media('panel.js')}"></script></body></html>`;
 		void vscode.commands.executeCommand('setContext', 'thoughtpath.reporting', vscode.workspace.getConfiguration('thoughtpath').get('automaticReporting', true));
@@ -160,7 +160,7 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand('thoughtpath.connect', () => { show(); return safe(toggleConnection); }),
 		vscode.lm.registerTool('thoughtpath_recordDecision', {
 			invoke(options: vscode.LanguageModelToolInvocationOptions<unknown>) {
-				const report = { ...decisionInput(options.input), id: randomUUID() };
+				const report = { ...decisionInput(options.input, reports), id: randomUUID() };
 				reports.push(report); if (reports.length > 50) { reports.shift(); }
 				selected = report.id; show(); update();
 				return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(JSON.stringify({ thoughtpathReportId: report.id, recorded: true }))]);

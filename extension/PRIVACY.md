@@ -1,6 +1,6 @@
 # ThoughtPath privacy notice
 
-Last updated: October 5, 2026. Applies to ThoughtPath 0.0.1, published by Khushdeep Brar (KhushdeepBrar).
+Last updated: October 8, 2026. Applies to ThoughtPath 0.0.1, 0.0.2, and 0.0.3, published by Khushdeep Brar (KhushdeepBrar).
 
 ## What ThoughtPath processes
 
@@ -12,7 +12,7 @@ The extension does not operate a publisher-controlled collection server or send 
 
 Automatic reporting is enabled by default while the ThoughtPath panel is open in a VS Code window. It supplies instructions asking Copilot to call recordDecision. The tool receives the model's summary and returns a report identifier and acknowledgement to Copilot. These instructions, tool calls, and results participate in the Copilot conversation and may be processed by GitHub/Microsoft and the selected model provider under your account, organization settings, and their applicable terms and privacy notices. ThoughtPath does not control their retention or training policies.
 
-Disable automatic reporting in ThoughtPath Settings or close the panel to stop supplying these instructions for future requests. This does not remove existing chat history or prevent explicitly requested tool calls. Disable recordDecision in Copilot's tool picker if you do not want it called. Reporting can consume additional model tokens.
+Disable automatic reporting in the ThoughtPath panel's Settings button or close the panel to stop supplying these instructions for future requests. This does not remove existing chat history or prevent explicitly requested tool calls. Disable recordDecision in Copilot's tool picker if you do not want it called. Reporting can consume additional model tokens.
 
 ## Optional trace capture and destinations
 

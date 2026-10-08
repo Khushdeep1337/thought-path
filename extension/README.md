@@ -6,17 +6,23 @@ Live decision maps for Copilot Agent chat: a distilled request, approaches consi
 
 1. Open this extension folder in VS Code. Run npm ci once, then press F5.
 2. In the Extension Development Host, run **ThoughtPath: Open Decision Map**.
-3. Open **Settings**, click **Connect traces**, review the local content-capture notice, and reload when prompted.
+3. Open the ThoughtPath panel, click its **Settings** button, choose **Connect traces**, review the local content-capture notice, and reload when prompted. This workflow is only supported in local VS Code desktop windows.
 4. Open Copilot **Agent** chat. Ensure **recordDecision** is enabled in the tool picker.
 5. Send your task. While the panel is open, bundled Copilot instructions request decision reports automatically.
 
 Reports arrive when Copilot calls the tool. Tools and token counts arrive as Copilot exports completed spans, usually after a short batch delay. Automatic reporting is enabled by default while the panel is open in this window. Settings can disable it, or provide a manual reporting prompt. Instructions apply to relevant future chat requests; they do not rewrite past messages or force the model to invoke a disabled tool.
 
-The panel is an editor tab, not an injected part of Copilot's interface. Resize or move its editor group to place it beside Chat. The decision selector shows recent reports; ThoughtPath does not know which chat has focus.
+The panel is an editor tab, not an injected part of Copilot's interface. Resize or move its editor group to place it beside Chat. The numbered selector focuses a decision and selects its tools and usage; the full title wraps below it. All retained reports remain visible on the map; ThoughtPath does not know which chat has focus.
 
 ## Graph and appearance
 
-Each decision has 1–4 reported approaches, not a fixed pair. The request branches to every approach; only the chosen branch connects to the outcome. Expand a node to read its justification. Wider graphs scroll horizontally inside the graph region.
+Each decision has 1–4 reported approaches, not a fixed pair. The request branches to every approach; only the chosen branch connects to the outcome. Expand a node to read its justification. The map scrolls vertically and horizontally inside the graph region. Each new report adds a decision. Related decisions form deeper paths when the tool supplies `parentReportId`, using the `thoughtpathReportId` returned by an earlier call. The parent’s outcome connects to the follow-up request; independent decisions remain separate. Links are explicitly reported relationships, not inferred conversation history. If an older parent is evicted, its retained child is shown with a missing-parent label.
+
+To test a deeper path, ask Copilot:
+
+> Use #recordDecision to record three related design decisions, calling the tool separately and sequentially for each: first choose polling or filesystem watching, then choose a read-buffer strategy based on that choice, then choose partial-line recovery based on the buffer strategy. For the second and third calls, set parentReportId to the thoughtpathReportId returned by the preceding call. Explain only alternatives actually considered and mark implementation as pending. Do not edit files.
+
+Manual reporting is supported; automatic instructions are a request to Copilot, not a guarantee that it will call the tool. Existing reports without a parent ID remain independent.
 
 Settings offers Follow VS Code (default), Light, and Dark. The automatic mode uses the editor theme colors. Both appearance and automatic reporting are also available in VS Code settings under ThoughtPath. Panel changes are saved for the workspace when one is open, otherwise for the user. Automatic instruction inclusion is gated by this window’s open panel, using the supported chatInstructions contribution.
 

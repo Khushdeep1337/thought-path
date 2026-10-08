@@ -2,7 +2,7 @@
 
 A VS Code extension that maps model-reported development decisions beside Copilot Chat, with live tool activity and reported token usage.
 
-**Try it:** open extension/ in VS Code, press F5, then run **ThoughtPath: Open Decision Map** in the Development Host. Connect traces in Settings, reload, and use Copilot Agent chat with recordDecision enabled. Reporting instructions are supplied while the panel is open.
+**Try it:** open extension/ in VS Code, press F5, then run **ThoughtPath: Open Decision Map** in the Development Host. In the panel, click **Settings** and then **Connect traces**, reload, and use Copilot Agent chat with recordDecision enabled. This workflow is for local VS Code desktop windows; Remote/WSL and other agent harnesses are not supported. Reporting instructions are supplied while the panel is open.
 
 See [setup, data handling, limitations, and development commands](extension/README.md) and the [privacy notice](extension/PRIVACY.md).
 
