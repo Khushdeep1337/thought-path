@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.0.4
+
+- Change the Marketplace package name to thoughtpath; the displayed name remains ThoughtPath.
+- Include the new PNG extension icon.
+
 ## 0.0.3
 
 - Remove the extra outline around the selected decision.

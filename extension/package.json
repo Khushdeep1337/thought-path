@@ -1,8 +1,9 @@
 {
-  "name": "thought-path",
-  "displayName": "ThoughtPath",
+  "name": "thoughtpath",
+  "displayName": "ThoughtPath - Agent Trace",
+  "icon": "media/icon.png",
   "description": "Live decision maps, tool activity and reported token usage for Copilot Agent chat.",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "engines": {
     "vscode": "^1.124.0"
   },

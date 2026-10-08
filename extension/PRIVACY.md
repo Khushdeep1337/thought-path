@@ -1,6 +1,6 @@
 # ThoughtPath privacy notice
 
-Last updated: October 8, 2026. Applies to ThoughtPath 0.0.1, 0.0.2, and 0.0.3, published by Khushdeep Brar (KhushdeepBrar).
+Last updated: October 8, 2026. Applies to ThoughtPath 0.0.1, 0.0.2, 0.0.3, and 0.0.4, published by Khushdeep Brar (KhushdeepBrar).
 
 ## What ThoughtPath processes
 

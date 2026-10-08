@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 
 suite('ThoughtPath live panel', () => {
 	test('registers the tool and receives tool invocations without starting capture', async () => {
-		const extension = vscode.extensions.all.find(candidate => candidate.packageJSON.name === 'thought-path');
+		const extension = vscode.extensions.all.find(candidate => candidate.packageJSON.name === 'thoughtpath');
 		assert.ok(extension);
 		const api = await extension.activate();
 		assert.equal(api.snapshot().theme, 'auto');
